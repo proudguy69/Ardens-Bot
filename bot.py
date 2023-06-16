@@ -5,6 +5,7 @@ import json
 # modules
 from modules.moderation import Moderation
 from modules.levels import Levels
+from modules.tickets import Tickets, ticketSelView
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -14,6 +15,8 @@ class Bot(commands.Bot):
         print(f"{self.user} is starting~!")
         await self.add_cog(Moderation())
         await self.add_cog(Levels())
+        await self.add_cog(Tickets(self))
+        await self.add_view(ticketSelView())
 
 bot = Bot()
 file = open('settings.json', 'r')
@@ -22,7 +25,7 @@ tree = bot.tree
 
 
 
-#conext menus
+#context menus
 
 @tree.context_menu(name='Flag Message')
 async def flag_message(interaction:discord.Interaction, message:discord.Message):

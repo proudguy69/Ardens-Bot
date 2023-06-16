@@ -1,4 +1,4 @@
-from .sql import LevelsDatabase
+from .database import LevelsDatabase
 import discord
 from discord.ext import commands
 from discord import app_commands
@@ -43,7 +43,7 @@ class Levels(commands.Cog):
         await interaction.response.send_message(embed=embed, ephemeral=hidden)
         
     
-    @app_commands.command(description='See the level of yourself or any other user')
+    @app_commands.command(description='Set the level of yourself or any other user')
     @app_commands.describe(
         user = 'the user you want to see the level of'
     )
@@ -85,7 +85,22 @@ class Levels(commands.Cog):
             await msg.channel.send(f"CONGRATS {user.mention}! You just leveled up! Level: {level}")
             
         LevelsDatabase.CreateRecord(user.id, level, xp, curtime)
+   
+    @app_commands.command(description='Claim the rewards of yourself, or claim the rewards for another user')
+    async def claim_rewards(self, interaction:discord.Interaction, user:discord.Member=None):
+        if not user: user = interaction.user
+        level = LevelsDatabase.getRecord('level', user.id)[0]
+        if level >= 15:
+            level15 = interaction.guild.get_role(1116156383574892614)
+            await user.add_roles(level15)
+            embed = discord.Embed(title='Rewards claimed!', description=f'I have given {user.mention} the following rewards:\n{level15.mention}', color=0x0000ff)
+            await interaction.response.send_message(embed=embed, content=user.mention)
+        else:
+            await interaction.response.send_message(f'{user.mention}\'s level isnt high enough!\nLevel needed: 15\nLevel: {level}')
             
+            
+            
+        
         
     
         
